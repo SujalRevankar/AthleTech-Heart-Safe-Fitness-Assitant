@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
@@ -34,8 +36,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           
           {/* Auth Routes */}
           <Route path="/auth/login" element={<Login />} />
@@ -43,37 +46,38 @@ const App = () => (
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           
           {/* Onboarding Routes */}
-          <Route path="/onboarding/welcome" element={<Welcome />} />
-          <Route path="/onboarding/fitness-assessment" element={<FitnessAssessment />} />
-          <Route path="/onboarding/body-metrics" element={<BodyMetrics />} />
-          <Route path="/onboarding/preferences" element={<Preferences />} />
+          <Route path="/onboarding/welcome" element={<ProtectedRoute><Welcome /></ProtectedRoute>} />
+          <Route path="/onboarding/fitness-assessment" element={<ProtectedRoute><FitnessAssessment /></ProtectedRoute>} />
+          <Route path="/onboarding/body-metrics" element={<ProtectedRoute><BodyMetrics /></ProtectedRoute>} />
+          <Route path="/onboarding/preferences" element={<ProtectedRoute><Preferences /></ProtectedRoute>} />
           
           {/* Profile & Settings Routes */}
-          <Route path="/profile/personal" element={<Personal />} />
-          <Route path="/settings/app" element={<AppSettings />} />
-          <Route path="/settings/connected-devices" element={<ConnectedDevices />} />
+          <Route path="/profile/personal" element={<ProtectedRoute><Personal /></ProtectedRoute>} />
+          <Route path="/settings/app" element={<ProtectedRoute><AppSettings /></ProtectedRoute>} />
+          <Route path="/settings/connected-devices" element={<ProtectedRoute><ConnectedDevices /></ProtectedRoute>} />
           
           {/* Workout Routes */}
-          <Route path="/workout/plan" element={<WorkoutPlan />} />
-          <Route path="/workout/active/:workoutId" element={<ActiveWorkout />} />
-          <Route path="/workout/summary/:sessionId" element={<WorkoutSummary />} />
+          <Route path="/workout/plan" element={<ProtectedRoute><WorkoutPlan /></ProtectedRoute>} />
+          <Route path="/workout/active/:workoutId" element={<ProtectedRoute><ActiveWorkout /></ProtectedRoute>} />
+          <Route path="/workout/summary/:sessionId" element={<ProtectedRoute><WorkoutSummary /></ProtectedRoute>} />
           
           {/* Progress Routes */}
-          <Route path="/progress/overview" element={<ProgressOverview />} />
-          <Route path="/progress/analytics" element={<Analytics />} />
-          <Route path="/progress/photos" element={<Photos />} />
+          <Route path="/progress/overview" element={<ProtectedRoute><ProgressOverview /></ProtectedRoute>} />
+          <Route path="/progress/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+          <Route path="/progress/photos" element={<ProtectedRoute><Photos /></ProtectedRoute>} />
           
           {/* Health & Safety Routes */}
-          <Route path="/health/dashboard" element={<HealthDashboard />} />
-          <Route path="/health/heart-health" element={<HeartHealth />} />
-          <Route path="/safety/alerts" element={<SafetyAlerts />} />
+          <Route path="/health/dashboard" element={<ProtectedRoute><HealthDashboard /></ProtectedRoute>} />
+          <Route path="/health/heart-health" element={<ProtectedRoute><HeartHealth /></ProtectedRoute>} />
+          <Route path="/safety/alerts" element={<ProtectedRoute><SafetyAlerts /></ProtectedRoute>} />
           
           {/* Premium Routes */}
-          <Route path="/premium/subscription" element={<Subscription />} />
+          <Route path="/premium/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

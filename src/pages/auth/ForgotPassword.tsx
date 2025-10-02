@@ -6,30 +6,32 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { ArrowLeft, Dumbbell, CheckCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { z } from "zod";
+
+const emailSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [countdown, setCountdown] = useState(0);
-  const { toast } = useToast();
+  const [error, setError] = useState("");
+  const { resetPassword } = useAuth();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setError("");
 
     try {
-      // TODO: Implement Supabase password reset
-      console.log("Password reset for:", email);
-
-      toast({
-        title: "Reset Link Sent",
-        description: "Password reset will be implemented in Phase 5.",
-      });
-
-      setTimeout(() => {
-        setIsLoading(false);
+      const validated = emailSchema.parse({ email });
+      setIsLoading(true);
+      
+      const { error } = await resetPassword(validated.email);
+      
+      if (!error) {
         setEmailSent(true);
         setCountdown(60);
 
@@ -42,14 +44,13 @@ const ForgotPassword = () => {
             return prev - 1;
           });
         }, 1000);
-      }, 1000);
+      }
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        setError(error.errors[0].message);
+      }
+    } finally {
       setIsLoading(false);
-      toast({
-        title: "Error",
-        description: "Failed to send reset email. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -112,6 +113,9 @@ const ForgotPassword = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
+                {error && (
+                  <p className="text-sm text-destructive">{error}</p>
+                )}
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? <LoadingSpinner size="sm" /> : "Send Reset Instructions"}

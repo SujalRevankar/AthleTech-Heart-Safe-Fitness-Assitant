@@ -1,4 +1,4 @@
-import { Menu } from "lucide-react";
+import { Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -8,8 +8,11 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Separator } from "@/components/ui/separator";
 
 export const TopHeader = () => {
+  const { signOut, user } = useAuth();
   return (
     <header className="sticky top-0 z-40 w-full bg-card border-b border-border">
       <div className="flex h-14 items-center px-4">
@@ -24,21 +27,31 @@ export const TopHeader = () => {
               <SheetTitle className="text-primary font-bold text-xl">AthleTech</SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-4 mt-8">
-              <Link to="/settings" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/settings/app" className="text-foreground hover:text-primary transition-colors">
                 App Settings
               </Link>
-              <Link to="/help" className="text-foreground hover:text-primary transition-colors">
-                Help & Support
-              </Link>
-              <Link to="/premium" className="text-foreground hover:text-primary transition-colors">
+              <Link to="/premium/subscription" className="text-foreground hover:text-primary transition-colors">
                 Premium Features
               </Link>
-              <Link to="/share" className="text-foreground hover:text-primary transition-colors">
-                Share App
+              <Link to="/profile/personal" className="text-foreground hover:text-primary transition-colors">
+                Profile
               </Link>
-              <Link to="/about" className="text-foreground hover:text-primary transition-colors">
-                About AthleTech
+              <Link to="/settings/connected-devices" className="text-foreground hover:text-primary transition-colors">
+                Connected Devices
               </Link>
+              {user && (
+                <>
+                  <Separator className="my-2" />
+                  <Button 
+                    variant="ghost" 
+                    className="justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={signOut}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </Button>
+                </>
+              )}
             </nav>
           </SheetContent>
         </Sheet>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +7,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Checkbox } from "@/components/ui/checkbox";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Eye, EyeOff, Dumbbell } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { z } from "zod";
+
+const signupSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
+});
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -17,8 +28,15 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<{ name?: string; email?: string; password?: string; confirmPassword?: string }>({});
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signUp, user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/", { replace: true });
+    }
+  }, [user, navigate]);
 
   const getPasswordStrength = (pass: string) => {
     if (pass.length < 6) return { strength: "weak", color: "bg-destructive" };
@@ -31,47 +49,29 @@ const Signup = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
 
     if (!agreedToTerms) {
-      toast({
-        title: "Terms Required",
-        description: "Please accept the terms and conditions to continue.",
-        variant: "destructive",
-      });
       return;
     }
-
-    if (!passwordsMatch) {
-      toast({
-        title: "Password Mismatch",
-        description: "Passwords do not match. Please try again.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsLoading(true);
 
     try {
-      // TODO: Implement Supabase authentication
-      console.log("Signup attempt:", { name, email });
+      const validated = signupSchema.parse({ name, email, password, confirmPassword });
+      setIsLoading(true);
       
-      toast({
-        title: "Success",
-        description: "Account created! Authentication will be implemented in Phase 5.",
-      });
-
-      setTimeout(() => {
-        setIsLoading(false);
-        navigate("/");
-      }, 1000);
+      await signUp(validated.email, validated.password, validated.name);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        const fieldErrors: { name?: string; email?: string; password?: string; confirmPassword?: string } = {};
+        error.errors.forEach((err) => {
+          if (err.path[0]) {
+            fieldErrors[err.path[0] as keyof typeof fieldErrors] = err.message;
+          }
+        });
+        setErrors(fieldErrors);
+      }
+    } finally {
       setIsLoading(false);
-      toast({
-        title: "Error",
-        description: "Failed to create account. Please try again.",
-        variant: "destructive",
-      });
     }
   };
 
@@ -101,6 +101,9 @@ const Signup = () => {
                 onChange={(e) => setName(e.target.value)}
                 required
               />
+              {errors.name && (
+                <p className="text-sm text-destructive">{errors.name}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -112,6 +115,9 @@ const Signup = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              {errors.email && (
+                <p className="text-sm text-destructive">{errors.email}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
@@ -140,6 +146,9 @@ const Signup = () => {
                   <span className="capitalize">{passwordStrength.strength}</span>
                 </div>
               )}
+              {errors.password && (
+                <p className="text-sm text-destructive">{errors.password}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirmPassword">Confirm Password</Label>
@@ -155,6 +164,9 @@ const Signup = () => {
                 <p className={`text-xs ${passwordsMatch ? "text-secondary" : "text-destructive"}`}>
                   {passwordsMatch ? "✓ Passwords match" : "✗ Passwords do not match"}
                 </p>
+              )}
+              {errors.confirmPassword && (
+                <p className="text-sm text-destructive">{errors.confirmPassword}</p>
               )}
             </div>
             <div className="flex items-center space-x-2">
