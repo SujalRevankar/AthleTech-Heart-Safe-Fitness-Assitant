@@ -2,8 +2,10 @@ import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dumbbell, Flame, Trophy, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   return (
     <Layout>
       <div className="p-4 space-y-6 max-w-7xl mx-auto">
@@ -20,7 +22,7 @@ const Dashboard = () => {
                 <h3 className="text-xl font-bold">Upper Body Strength</h3>
                 <p className="text-sm opacity-75">45 minutes • 8 exercises</p>
               </div>
-              <Button size="lg" variant="secondary">
+              <Button size="lg" variant="secondary" onClick={() => navigate("/workout/plan")}>
                 Start Workout
               </Button>
             </div>
@@ -77,7 +79,7 @@ const Dashboard = () => {
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3">
-            <Button variant="outline" className="justify-start h-auto py-3">
+            <Button variant="outline" className="justify-start h-auto py-3" onClick={() => navigate("/workout/plan")}>
               <Dumbbell className="mr-3 h-5 w-5" />
               <div className="text-left">
                 <p className="font-medium">Browse Workouts</p>

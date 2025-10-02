@@ -15,7 +15,15 @@ import Personal from "./pages/profile/Personal";
 import AppSettings from "./pages/settings/AppSettings";
 import ConnectedDevices from "./pages/settings/ConnectedDevices";
 import Photos from "./pages/progress/Photos";
-import Placeholder from "./pages/Placeholder";
+import WorkoutPlan from "./pages/workout/WorkoutPlan";
+import ActiveWorkout from "./pages/workout/ActiveWorkout";
+import WorkoutSummary from "./pages/workout/WorkoutSummary";
+import ProgressOverview from "./pages/progress/ProgressOverview";
+import Analytics from "./pages/progress/Analytics";
+import HealthDashboard from "./pages/health/HealthDashboard";
+import HeartHealth from "./pages/health/HeartHealth";
+import SafetyAlerts from "./pages/safety/SafetyAlerts";
+import Subscription from "./pages/premium/Subscription";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,14 +53,23 @@ const App = () => (
           <Route path="/settings/app" element={<AppSettings />} />
           <Route path="/settings/connected-devices" element={<ConnectedDevices />} />
           
+          {/* Workout Routes */}
+          <Route path="/workout/plan" element={<WorkoutPlan />} />
+          <Route path="/workout/active/:workoutId" element={<ActiveWorkout />} />
+          <Route path="/workout/summary/:sessionId" element={<WorkoutSummary />} />
+          
           {/* Progress Routes */}
+          <Route path="/progress/overview" element={<ProgressOverview />} />
+          <Route path="/progress/analytics" element={<Analytics />} />
           <Route path="/progress/photos" element={<Photos />} />
           
-          {/* Main App Routes - Placeholders for Phase 3+ */}
-          <Route path="/workout" element={<Placeholder title="Workout" description="Workout planning and tracking coming soon!" />} />
-          <Route path="/progress" element={<Placeholder title="Progress" description="Progress tracking and analytics coming soon!" />} />
-          <Route path="/health" element={<Placeholder title="Health" description="Health monitoring and safety features coming soon!" />} />
-          <Route path="/profile" element={<Placeholder title="Profile" description="Profile management coming soon!" />} />
+          {/* Health & Safety Routes */}
+          <Route path="/health/dashboard" element={<HealthDashboard />} />
+          <Route path="/health/heart-health" element={<HeartHealth />} />
+          <Route path="/safety/alerts" element={<SafetyAlerts />} />
+          
+          {/* Premium Routes */}
+          <Route path="/premium/subscription" element={<Subscription />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

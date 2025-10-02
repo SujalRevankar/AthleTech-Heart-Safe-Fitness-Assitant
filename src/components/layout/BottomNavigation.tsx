@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
-  { icon: Dumbbell, label: "Workout", path: "/workout" },
-  { icon: TrendingUp, label: "Progress", path: "/progress" },
-  { icon: Heart, label: "Health", path: "/health" },
-  { icon: User, label: "Profile", path: "/profile" },
+  { icon: Dumbbell, label: "Workout", path: "/workout/plan" },
+  { icon: TrendingUp, label: "Progress", path: "/progress/overview" },
+  { icon: Heart, label: "Health", path: "/health/dashboard" },
+  { icon: User, label: "Profile", path: "/profile/personal" },
 ];
 
 export const BottomNavigation = () => {
@@ -17,7 +17,7 @@ export const BottomNavigation = () => {
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border">
       <div className="flex justify-around items-center h-16 px-2">
         {navItems.map(({ icon: Icon, label, path }) => {
-          const isActive = location.pathname === path;
+          const isActive = location.pathname.startsWith(path) || location.pathname === path;
           return (
             <Link
               key={path}
