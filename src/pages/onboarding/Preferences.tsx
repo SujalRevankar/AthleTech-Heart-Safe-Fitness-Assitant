@@ -7,6 +7,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Dumbbell, Zap, Target, Bike } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
 
 const muscleGroups = [
   { name: "Chest", icon: Target },
@@ -28,9 +32,11 @@ const equipment = [
 
 const Preferences = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
   const [duration, setDuration] = useState([30]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [notifications, setNotifications] = useState({
     workout: true,
     rest: true,
@@ -49,8 +55,44 @@ const Preferences = () => {
     );
   };
 
-  const handleFinish = () => {
-    navigate("/dashboard");
+  const handleFinish = async () => {
+    if (!user) {
+      toast.error("Please sign in to continue");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      // Get experience level and fitness goals from previous onboarding steps
+      // For now, we'll use defaults - in production, these would be passed through navigation state
+      const experienceLevel = 'beginner'; // This should come from FitnessAssessment
+      const fitnessGoals = ['general_fitness']; // This should come from FitnessAssessment
+
+      const { error } = await supabase
+        .from('user_preferences')
+        .upsert({
+          user_id: user.id,
+          experience_level: experienceLevel,
+          fitness_goals: fitnessGoals,
+          preferred_muscle_groups: selectedMuscles,
+          available_equipment: selectedEquipment,
+          typical_workout_duration: duration[0],
+          notifications_workout: notifications.workout,
+          notifications_rest: notifications.rest,
+          notifications_achievements: notifications.achievements
+        } as any);
+
+      if (error) throw error;
+
+      toast.success("Profile setup complete!");
+      navigate("/");
+    } catch (error: any) {
+      console.error('Error saving preferences:', error);
+      toast.error("Failed to save preferences. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -178,9 +220,9 @@ const Preferences = () => {
         <Button
           onClick={handleFinish}
           className="w-full"
-          disabled={selectedMuscles.length === 0 || selectedEquipment.length === 0}
+          disabled={selectedMuscles.length === 0 || selectedEquipment.length === 0 || isLoading}
         >
-          Finish Setup
+          {isLoading ? <LoadingSpinner size="sm" /> : "Finish Setup"}
         </Button>
       </div>
     </div>

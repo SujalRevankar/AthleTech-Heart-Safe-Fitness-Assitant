@@ -1,12 +1,12 @@
 {
-  "name": "AthleTech - Intelligent Fitness Training",
+  "name": "AthleTech",
   "short_name": "AthleTech",
-  "description": "AI-powered workout planning and safety-focused training",
+  "description": "AI-Powered Fitness Training - Personalized workouts with safety-first approach",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
+  "background_color": "#ffffff",
   "theme_color": "#1E40AF",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/placeholder.svg",
@@ -19,6 +19,15 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "fitness", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/placeholder.svg",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
     }
   ]
 }
